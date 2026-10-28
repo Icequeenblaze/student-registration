@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration Form</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 15px;
+            font-family: Arial, sans-serif;
+            background-color: #eaf7f0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: #08734f;
+            color: white;
+            text-align: center;
+            padding: 25px 20px;
+        }
+
+        .header h1 {
+            margin: 0 0 12px;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .form-area {
+            padding: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            color: #23483b;
+            font-weight: bold;
+        }
+
+        input, select {
+            display: block;
+            width: 100%;
+            padding: 13px;
+            margin-bottom: 18px;
+            border: 1px solid #cbd5d1;
+            border-radius: 6px;
+            font-size: 16px;
+            background-color: white;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 6px;
+            background-color: #08734f;
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #065c3f;
+        }
+
+        #result {
+            display: none;
+            margin-top: 22px;
+            padding: 18px;
+            background-color: #e5f5ec;
+            border-radius: 8px;
+            color: #075c40;
+            overflow-wrap: anywhere;
+        }
+
+        #result h2 {
+            margin-top: 0;
+        }
+
+        #result p {
+            margin: 10px 0;
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .form-area {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <h1>Student Registration</h1>
+            <p>Fill in the details below to register a student.</p>
+        </header>
+
+        <div class="form-area">
+
+            <form id="studentForm" novalidate>
+
+                <label for="studentName">Student Name</label>
+                <input
+                    type="text"
+                    id="studentName"
+                    placeholder="Enter student's full name"
+                    required
+                >
+
+                <label for="studentSex">Sex</label>
+                <select id="studentSex" required>
+                    <option value="">Select sex</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+
+                <label for="dateOfBirth">Date of Birth (DD/MM/YYYY)</label>
+                <input
+                    type="text"
+                    id="dateOfBirth"
+                    placeholder="DD/MM/YYYY"
+                    maxlength="10"
+                    required
+                >
+
+                <label for="studentCourse">Course</label>
+                <input
+                    type="text"
+                    id="studentCourse"
+                    placeholder="Enter course of study"
+                    required
+                >
+
+                <label for="stateOrigin">State of Origin</label>
+                <input
+                    type="text"
+                    id="stateOrigin"
+                    placeholder="Enter state of origin"
+                    required
+                >
+
+                <button type="submit">Submit</button>
+
+            </form>
+
+            <div id="result" aria-live="polite"></div>
+
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById("studentForm");
+        const result = document.getElementById("result");
+
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById("studentName").value.trim();
+            const sex = document.getElementById("studentSex").value;
+            const dob = document.getElementById("dateOfBirth").value.trim();
+            const course = document.getElementById("studentCourse").value.trim();
+            const state = document.getElementById("stateOrigin").value.trim();
+
+            if (name === "" || sex === "" || dob === "" ||
+                course === "" || state === "") {
+                result.style.display = "block";
+                result.textContent = "Please fill in all the fields.";
+                return;
+            }
+
+            const datePattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+            const match = dob.match(datePattern);
+
+            if (!match) {
+                result.style.display = "block";
+                result.textContent =
+                    "Please enter your date of birth as DD/MM/YYYY, e.g. 25/04/2005.";
+                return;
+            }
+
+            const day = Number(match[1]);
+            const month = Number(match[2]);
+            const year = Number(match[3]);
+            const date = new Date(year, month - 1, day);
+
+            if (
+                date.getFullYear() !== year ||
+                date.getMonth() !== month - 1 ||
+                date.getDate() !== day
+            ) {
+                result.style.display = "block";
+                result.textContent = "Please enter a valid date of birth.";
+                return;
+            }
+
+            result.replaceChildren();
+
+            const heading = document.createElement("h2");
+            heading.textContent = "Registration Successful!";
+
+            result.appendChild(heading);
+
+            const details = [
+                ["Student Name", name],
+                ["Sex", sex],
+                ["Date of Birth", dob],
+                ["Course", course],
+                ["State of Origin", state]
+            ];
+
+            details.forEach(function(item) {
+                const paragraph = document.createElement("p");
+                const label = document.createElement("strong");
+
+                label.textContent = item[0] + ": ";
+                paragraph.appendChild(label);
+                paragraph.appendChild(document.createTextNode(item[1]));
+                result.appendChild(paragraph);
+            });
+
+            result.style.display = "block";
+            result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        });
+    </script>
+
+</body>
+</html>
